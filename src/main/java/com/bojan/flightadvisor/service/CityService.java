@@ -1,30 +1,24 @@
 package com.bojan.flightadvisor.service;
 
-import com.bojan.flightadvisor.dto.mapper.CityMapper;
+import com.bojan.flightadvisor.dto.model.AirportDto;
+import com.bojan.flightadvisor.dto.model.CityCommentDto;
 import com.bojan.flightadvisor.dto.model.CityDto;
-import com.bojan.flightadvisor.entity.City;
-import com.bojan.flightadvisor.exception.EntityAlreadyExistException;
-import com.bojan.flightadvisor.repository.CityRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import com.bojan.flightadvisor.entity.CustomUser;
 
-@Component
-public class CityService {
+import java.util.List;
+import java.util.Optional;
 
-    @Autowired
-    private CityRepository cityRepository;
+public interface CityService {
 
-    public CityDto addCity(CityDto cityDto) {
-        City city = cityRepository.findByNameAndCountry(cityDto.getName(), cityDto.getCountry());
-        if (city != null) {
-            throw new EntityAlreadyExistException(String.format("There is a city with name %s and country %s.",
-                    cityDto.getName(), cityDto.getCountry()));
-        }
-        city = new City()
-                .setName(cityDto.getName())
-                .setCountry(cityDto.getCountry())
-                .setDescription(cityDto.getDescription());
+    CityDto addCity(CityDto cityDto);
 
-        return CityMapper.toCityDto(cityRepository.save(city));
-    }
+    AirportDto addAirport(AirportDto airportDto);
+
+    List<CityDto> searchCities(Optional<String> nameOpt, Optional<Integer> commentsNum);
+
+    CityCommentDto addComment(CityCommentDto commentDto, CustomUser user);
+
+    String deleteComment(Long commentId, CustomUser user);
+
+    CityCommentDto updateComment(Long id, CityCommentDto comment, CustomUser user);
 }

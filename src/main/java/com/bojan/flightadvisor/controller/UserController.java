@@ -1,7 +1,7 @@
 package com.bojan.flightadvisor.controller;
 
 import com.bojan.flightadvisor.dto.model.UserDto;
-import com.bojan.flightadvisor.service.UserService;
+import com.bojan.flightadvisor.service.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +14,7 @@ import javax.validation.constraints.NotNull;
 public class UserController {
 
     @Autowired
-    private UserService userService;
+    private UserServiceImpl userService;
 
     @GetMapping
     public String healthcheck1() {

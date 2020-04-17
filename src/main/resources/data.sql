@@ -5,3 +5,4 @@ insert into CITY (id, name, country, description) values
 (4, 'Nadzab', 'Papua New Guinea', 'comment'),
 (5, 'Port Moresby', 'Papua New Guinea', 'comment'),
 (6, 'Wewak', 'Papua New Guinea', 'comment');
+

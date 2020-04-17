@@ -16,7 +16,6 @@ import javax.persistence.*;
 public class Airport {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     @Column(nullable = false)
     private String name;
@@ -35,7 +34,7 @@ public class Airport {
     @Column
     private int altitude;
     @Column
-    private int timezone;
+    private String timezone;
     @Column
     private String dst;
     @Column

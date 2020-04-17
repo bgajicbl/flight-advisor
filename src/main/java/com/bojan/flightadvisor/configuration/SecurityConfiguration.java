@@ -1,6 +1,6 @@
 package com.bojan.flightadvisor.configuration;
 
-import com.bojan.flightadvisor.service.DatabaseUserDetailsService;
+import com.bojan.flightadvisor.authentication.DatabaseUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

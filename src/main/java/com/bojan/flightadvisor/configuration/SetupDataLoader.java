@@ -5,6 +5,7 @@ import com.bojan.flightadvisor.entity.Role;
 import com.bojan.flightadvisor.repository.RoleRepository;
 import com.bojan.flightadvisor.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,6 +26,11 @@ public class SetupDataLoader implements ApplicationListener<ApplicationReadyEven
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Value("${app.user.name}")
+    private String userName;
+    @Value("${app.user.password}")
+    private String userPasword;
+
     @Override
     @Transactional
     public void onApplicationEvent(ApplicationReadyEvent applicationReadyEvent) {
@@ -34,10 +40,10 @@ public class SetupDataLoader implements ApplicationListener<ApplicationReadyEven
 
         Role adminRole = roleRepository.findByName("ROLE_ADMIN");
         CustomUser user = new CustomUser();
-        user.setUsername("admin");
-        user.setFirstName("Pero");
-        user.setLastName("Peric");
-        user.setPassword(passwordEncoder.encode("test"));
+        user.setUsername(userName);
+        user.setFirstName("Admin");
+        user.setLastName("Admin");
+        user.setPassword(passwordEncoder.encode(userPasword));
         user.setRoles(Arrays.asList(adminRole));
         user.setEnabled(true);
         userRepository.save(user);

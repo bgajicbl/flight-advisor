@@ -18,10 +18,10 @@ public class Route {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @Column(nullable = false)
-    private String airline;
-    @Column(nullable = false)
-    private long airlineId;
+
+    @ManyToOne
+    @JoinColumn(name="airline", nullable=false)
+    private Airline airline;
 
     @ManyToOne
     @JoinColumn(name="source_airport", nullable=false)

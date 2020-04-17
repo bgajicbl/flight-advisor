@@ -3,6 +3,7 @@ package com.bojan.flightadvisor.exception;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,10 +27,19 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
         return new ResponseEntity(ex.getMessage(), HttpStatus.CONFLICT);
     }
 
+    @ExceptionHandler(EntityNotFoundException.class)
+    public final ResponseEntity handleEntityNotFoundException(Exception ex, WebRequest request) {
+        return new ResponseEntity(ex.getMessage(), HttpStatus.NOT_FOUND  );
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public final ResponseEntity handleAccessDeniedException(Exception ex, WebRequest request) {
+        return new ResponseEntity(ex.getMessage(), HttpStatus.UNAUTHORIZED );
+    }
+
     @ResponseBody
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
-    public ResponseEntity handleAmbiguousTermException(Exception ex) {
+    public ResponseEntity handleInternalException(Exception ex) {
         logger.error("INTERNAL_SERVER_ERROR", ex);
         return new ResponseEntity("Internal server error!", HttpStatus.INTERNAL_SERVER_ERROR);
     }

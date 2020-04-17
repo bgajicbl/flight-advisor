@@ -14,7 +14,7 @@ import java.util.Set;
 @Component
 public class UserDetailsMapper {
 
-    public UserDetails toUserDetails(CustomUser customUser) {
+    public UserDetails toUserDetails(final CustomUser customUser) {
 
         return User.withUsername(customUser.getUsername())
                 .password(customUser.getPassword())
@@ -22,11 +22,10 @@ public class UserDetailsMapper {
                 .build();
     }
 
-    private Set<GrantedAuthority> getAuthorities(CustomUser user) {
+    private Set<GrantedAuthority> getAuthorities(final CustomUser user) {
         Set<GrantedAuthority> authorities = new HashSet<>();
         for (Role role : user.getRoles()) {
-            GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(role.getName());
-            authorities.add(grantedAuthority);
+            authorities.add(new SimpleGrantedAuthority(role.getName()));
         }
         return authorities;
     }

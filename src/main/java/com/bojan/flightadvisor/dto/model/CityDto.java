@@ -6,12 +6,14 @@ import lombok.Data;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.List;
 
 @Data
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CityDto {
 
+    private long id;
     @NotNull
     @Size(min=2)
     private String name;
@@ -21,5 +23,7 @@ public class CityDto {
     @NotNull
     @Size(min=2)
     private String description;
+
+    private List<CityCommentDto> comments;
 
 }
