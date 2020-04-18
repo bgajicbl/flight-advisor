@@ -14,7 +14,7 @@ import java.util.TreeSet;
 @Setter
 @NoArgsConstructor
 @Accessors(chain = true)
-@Table(name = "city")
+@Table(name = "city", uniqueConstraints = {@UniqueConstraint(columnNames = {"name", "country"})})
 public class  City {
 
     @Id

@@ -13,7 +13,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CityDto {
 
-    private long id;
+    private Long id;
     @NotNull
     @Size(min=2)
     private String name;

@@ -5,6 +5,7 @@ import com.bojan.flightadvisor.dto.model.FlightDto;
 import com.bojan.flightadvisor.entity.Airport;
 import com.bojan.flightadvisor.entity.City;
 import com.bojan.flightadvisor.entity.Route;
+import com.bojan.flightadvisor.exception.EntityNotFoundException;
 import com.bojan.flightadvisor.processor.FlightGraph;
 import com.bojan.flightadvisor.processor.FlightNode;
 import com.bojan.flightadvisor.processor.FlightPriceProcessor;
@@ -14,8 +15,9 @@ import com.bojan.flightadvisor.repository.RouteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.persistence.EntityNotFoundException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
 
 @Component
 public class FlightServiceImpl implements FlightService {
@@ -32,17 +34,17 @@ public class FlightServiceImpl implements FlightService {
     public FlightDto calculateCheapest(final Long cityFromId, final Long cityToId) {
 
         City originCity = cityRepository.findById(cityFromId)
-                .orElseThrow(() -> new EntityNotFoundException("Origin city not found!"));
+                .orElseThrow(() -> new EntityNotFoundException(City.class, "cityFromId", cityFromId.toString()));
         City destinationCity = cityRepository.findById(cityToId)
-                .orElseThrow(() -> new EntityNotFoundException("Destination city not found!"));
+                .orElseThrow(() -> new EntityNotFoundException(City.class, "cityToId", cityToId.toString()));
 
         List<Airport> originAirports = airportRepository.findByCity(originCity);
         if (originAirports.isEmpty()) {
-            throw new EntityNotFoundException("No airport in origin city found!");
+            throw new EntityNotFoundException(Airport.class, "cityFromId", cityFromId.toString());
         }
         List<Airport> destinationAirports = airportRepository.findByCity(destinationCity);
         if (destinationAirports.isEmpty()) {
-            throw new EntityNotFoundException("No airport in destination city found!");
+            throw new EntityNotFoundException(Airport.class, "cityFromId", cityToId.toString());
         }
         final List<Route> routes = routeRepository.findAll();
         final List<Airport> airports = airportRepository.findAll();
@@ -78,7 +80,7 @@ public class FlightServiceImpl implements FlightService {
             }
         }
         if (cheapestNode == null) {
-            throw new EntityNotFoundException("Can't find the route!");
+            throw new EntityNotFoundException(Route.class, "cityFromId", cityFromId.toString(), "cityFromId", cityToId.toString());
         }
 
         return FlightMapper.toFlightDto(cheapestNode);

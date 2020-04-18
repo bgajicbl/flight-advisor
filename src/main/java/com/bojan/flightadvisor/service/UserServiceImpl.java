@@ -5,7 +5,7 @@ import com.bojan.flightadvisor.dto.mapper.UserMapper;
 import com.bojan.flightadvisor.dto.model.UserDto;
 import com.bojan.flightadvisor.entity.CustomUser;
 import com.bojan.flightadvisor.entity.Role;
-import com.bojan.flightadvisor.exception.EntityAlreadyExistException;
+import com.bojan.flightadvisor.exception.EntityExistsException;
 import com.bojan.flightadvisor.repository.RoleRepository;
 import com.bojan.flightadvisor.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +36,7 @@ public class UserServiceImpl implements UserService {
     public UserDto register(final UserDto userDto) {
         Optional<CustomUser> userOpt = userRepository.findByUsername(userDto.getUsername());
         if (userOpt.isPresent()) {
-            throw new EntityAlreadyExistException("There is an account with that username: " + userDto.getUsername());
+            throw new EntityExistsException(CustomUser.class, "username", userDto.getUsername());
         }
         Role userRole = roleRepository.findByName("ROLE_USER");
         CustomUser user = new CustomUser()

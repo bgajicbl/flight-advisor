@@ -8,6 +8,7 @@ import com.bojan.flightadvisor.entity.CustomUser;
 import com.bojan.flightadvisor.service.CityService;
 import com.bojan.flightadvisor.service.FlightService;
 import com.bojan.flightadvisor.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
@@ -52,19 +53,23 @@ public class CityController {
     @Autowired
     private CityService cityService;
 
+    @Operation(summary = "Add new city", description = "Adding a new city", tags = { "city" })
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/add")
     @ResponseStatus(HttpStatus.CREATED)
     public CityDto addCity(@NotNull @Valid @RequestBody final CityDto cityDto) {
+
         return cityService.addCity(cityDto);
     }
 
+    @Operation(summary = "Get all cities", description = "Get all cities", tags = { "city" })
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<CityDto> getAllCities(@RequestParam final Optional<Integer> commentsNum) {
         return cityService.searchCities(Optional.empty(), commentsNum);
     }
 
+    @Operation(summary = "Search for city by name", description = "Search for city by name", tags = { "city" })
     @GetMapping("/{name}")
     @ResponseStatus(HttpStatus.OK)
     public List<CityDto> searchCities(@PathVariable @NotNull final String name, @RequestParam final Optional<Integer> commentsNum) {
@@ -73,6 +78,7 @@ public class CityController {
 
     }
 
+    @Operation(summary = "Add a comment", description = "Add a comment to a city", tags = { "comment" })
     @PostMapping("/comment/add")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public CityCommentDto addComment(@NotNull @Valid @RequestBody final CityCommentDto comment) {
@@ -82,6 +88,7 @@ public class CityController {
         return cityService.addComment(comment, user);
     }
 
+    @Operation(summary = "Delete a comment", description = "Delete a comment to a city", tags = { "comment" })
     @DeleteMapping("/comment/{id}")
     @ResponseStatus(HttpStatus.OK)
     public String deleteComment(@PathVariable @NotNull final Long id) {
@@ -91,6 +98,7 @@ public class CityController {
         return cityService.deleteComment(id, user);
     }
 
+    @Operation(summary = "Edit a comment", description = "Edit a comment to a city", tags = { "comment" })
     @PutMapping("/comment/{id}")
     @ResponseStatus(HttpStatus.OK)
     public CityCommentDto updateComment(@NotNull @Valid @RequestBody final CityCommentDto comment, @PathVariable @NotNull final Long id) {
@@ -100,6 +108,7 @@ public class CityController {
         return cityService.updateComment(id, comment, user);
     }
 
+    @Operation(summary = "Add an airport", description = "Add a new airport", tags = { "airport" })
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/airport/add")
     @ResponseStatus(HttpStatus.ACCEPTED)
@@ -114,6 +123,7 @@ public class CityController {
         return "ok";
     }
 
+    @Operation(summary = "Add a route", description = "Add a new route", tags = { "route" })
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/route/add")
     @ResponseStatus(HttpStatus.ACCEPTED)
@@ -129,6 +139,7 @@ public class CityController {
 
     }
 
+    @Operation(summary = "Find a cheapest route", description = "Find a cheapest route", tags = { "route" })
     @GetMapping("/route/from/{cityFrom}/to/{cityTo}")
     @ResponseStatus(HttpStatus.OK)
     public FlightDto searchCheapestRoute(@PathVariable @NotNull final Long cityFrom, @PathVariable @NotNull final Long cityTo) {

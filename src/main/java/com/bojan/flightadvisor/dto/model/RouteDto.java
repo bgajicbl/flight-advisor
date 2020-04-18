@@ -18,17 +18,17 @@ public class RouteDto {
     @Size(min = 2, max = 3)
     private String airline;
     @NotNull
-    private long airlineId;
+    private Long airlineId;
     @NotNull
     @Size(min = 2)
     private String sourceAirport;
     @NotNull
-    private long sourceAirportId;
+    private Long sourceAirportId;
     @NotNull
     @Size(min = 2)
     private String destinationAirport;
     @NotNull
-    private long destinationAirportId;
+    private Long destinationAirportId;
 
     private String codeShare;
 

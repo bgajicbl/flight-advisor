@@ -15,7 +15,7 @@ import javax.validation.constraints.Size;
 public class AirportDto {
 
     @NotNull
-    private long id;
+    private Long id;
     @NotNull
     @Size(min = 2)
     private String name;

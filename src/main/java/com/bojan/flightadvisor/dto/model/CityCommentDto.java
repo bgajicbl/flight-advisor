@@ -12,9 +12,9 @@ import javax.validation.constraints.NotNull;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CityCommentDto {
 
-    private long id;
+    private Long id;
     @NotNull
-    private long cityId;
+    private Long cityId;
     @NotEmpty(message = "Comment may not be empty!")
     private String comment;
     private String timeCreated;
