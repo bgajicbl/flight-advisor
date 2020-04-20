@@ -30,6 +30,13 @@ public class FlightServiceImpl implements FlightService {
     @Autowired
     private RouteRepository routeRepository;
 
+    /**
+     * Handles cheapest flight calculation
+     *
+     * @param cityFromId
+     * @param cityToId
+     * @return the FlightDto object
+     */
     @Override
     public FlightDto calculateCheapest(final Long cityFromId, final Long cityToId) {
 

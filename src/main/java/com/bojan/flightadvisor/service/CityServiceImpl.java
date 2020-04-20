@@ -4,12 +4,14 @@ import com.bojan.flightadvisor.dto.mapper.CityCommentMapper;
 import com.bojan.flightadvisor.dto.mapper.CityMapper;
 import com.bojan.flightadvisor.dto.model.AirportDto;
 import com.bojan.flightadvisor.dto.model.CityCommentDto;
+import com.bojan.flightadvisor.dto.model.CityCommentUpdateDto;
 import com.bojan.flightadvisor.dto.model.CityDto;
 import com.bojan.flightadvisor.entity.Airport;
 import com.bojan.flightadvisor.entity.City;
 import com.bojan.flightadvisor.entity.CityComment;
 import com.bojan.flightadvisor.entity.CustomUser;
-import com.bojan.flightadvisor.exception.EntityAlreadyExistException;
+import com.bojan.flightadvisor.exception.EntityExistsException;
+import com.bojan.flightadvisor.exception.EntityNotFoundException;
 import com.bojan.flightadvisor.repository.AirportRepository;
 import com.bojan.flightadvisor.repository.CityCommentRepository;
 import com.bojan.flightadvisor.repository.CityRepository;
@@ -17,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 
-import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -33,12 +34,17 @@ public class CityServiceImpl implements CityService {
     @Autowired
     private AirportRepository airportRepository;
 
+    /**
+     * Handle addition of a new city
+     *
+     * @param cityDto CityDto
+     * @return
+     */
     @Override
     public CityDto addCity(final CityDto cityDto) {
         Optional<City> cityOpt = cityRepository.findByNameAndCountry(cityDto.getName(), cityDto.getCountry());
         if (cityOpt.isPresent()) {
-            throw new EntityAlreadyExistException(String.format("There is a city with name %s and country %s.",
-                    cityDto.getName(), cityDto.getCountry()));
+            throw new EntityExistsException(City.class, "name", cityDto.getName(), "country", cityDto.getCountry());
         }
         City city = new City()
                 .setName(cityDto.getName())
@@ -48,10 +54,16 @@ public class CityServiceImpl implements CityService {
         return CityMapper.toCityDto(cityRepository.save(city));
     }
 
+    /**
+     * Handle addition of a new airport
+     *
+     * @param airportDto AirportDto
+     * @return the AirportDto object
+     */
     @Override
     public AirportDto addAirport(final AirportDto airportDto) {
         City city = cityRepository.findByNameAndCountry(airportDto.getCity(), airportDto.getCountry())
-                .orElseThrow(() -> new EntityNotFoundException("City not found!"));
+                .orElseThrow(() -> new EntityNotFoundException(City.class, "city", airportDto.getCity(), "country", airportDto.getCountry()));
 
         Airport airport = new Airport()
                 .setId(airportDto.getId())
@@ -64,6 +76,13 @@ public class CityServiceImpl implements CityService {
         return airportDto;
     }
 
+    /**
+     * Handle city search by name
+     *
+     * @param nameOpt city name
+     * @param commentsNum number of comments to be returned
+     * @return list of CityDto
+     */
     @Override
     public List<CityDto> searchCities(final Optional<String> nameOpt, final Optional<Integer> commentsNum) {
         List<City> cities = null;
@@ -98,15 +117,21 @@ public class CityServiceImpl implements CityService {
 
     }
 
+    /**
+     * Handles add comment
+     *
+     * @param commentDto
+     * @param user
+     * @return the CityCommentDto object
+     */
     @Override
     public CityCommentDto addComment(final CityCommentDto commentDto, final CustomUser user) {
         City city = cityRepository.findById(commentDto.getCityId())
-                .orElseThrow(() -> new EntityNotFoundException("City not found!"));
+                .orElseThrow(() -> new EntityNotFoundException(City.class, "cityId", commentDto.getCityId().toString()));
 
         Optional<CityComment> cityCommentOpt = cityCommentRepository.findByCityAndUser(city, user);
         if (cityCommentOpt.isPresent()) {
-            throw new EntityAlreadyExistException(String.format("There is a comment from user %s for city %s.",
-                    user.getUsername(), city.getName()));
+            throw new EntityExistsException(CityComment.class, "user", user.getUsername(), "city", city.getName());
         }
         CityComment cityComment = new CityComment()
                 .setCity(city)
@@ -117,10 +142,17 @@ public class CityServiceImpl implements CityService {
         return CityCommentMapper.toCityCommentDto(cityCommentRepository.save(cityComment));
     }
 
+    /**
+     * Handles comment deletion
+     *
+     * @param commentId
+     * @param user Authenticated user
+     * @return String message
+     */
     @Override
     public String deleteComment(final Long commentId, final CustomUser user) {
         CityComment cityComment = cityCommentRepository.findById(commentId)
-                .orElseThrow(() -> new EntityNotFoundException("Comment not found!"));
+                .orElseThrow(() -> new EntityNotFoundException(CityComment.class, "id", commentId.toString()));
 
         if (user.equals(cityComment.getUser())) {
             cityCommentRepository.delete(cityComment);
@@ -130,13 +162,21 @@ public class CityServiceImpl implements CityService {
         }
     }
 
+    /**
+     * Handles comment update
+     *
+     * @param commentId
+     * @param comment
+     * @param user
+     * @return the CityCommentDto object
+     */
     @Override
-    public CityCommentDto updateComment(final Long commentId, final CityCommentDto commentDto, final CustomUser user) {
+    public CityCommentDto updateComment(final Long commentId, final CityCommentUpdateDto comment, final CustomUser user) {
         CityComment cityComment = cityCommentRepository.findById(commentId)
-                .orElseThrow(() -> new EntityNotFoundException("Comment not found!"));
+                .orElseThrow(() -> new EntityNotFoundException(CityComment.class, "id", commentId.toString()));
 
         if (user.equals(cityComment.getUser())) {
-            cityComment.setComment(commentDto.getComment());
+            cityComment.setComment(comment.getComment());
             cityComment.setModifiedAt(LocalDateTime.now());
 
             return CityCommentMapper.toCityCommentDto(cityCommentRepository.save(cityComment));

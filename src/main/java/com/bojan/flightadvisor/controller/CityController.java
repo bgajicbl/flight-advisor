@@ -1,14 +1,12 @@
 package com.bojan.flightadvisor.controller;
 
-import com.bojan.flightadvisor.dto.model.CityCommentDto;
-import com.bojan.flightadvisor.dto.model.CityDto;
-import com.bojan.flightadvisor.dto.model.FileImport;
-import com.bojan.flightadvisor.dto.model.FlightDto;
+import com.bojan.flightadvisor.dto.model.*;
 import com.bojan.flightadvisor.entity.CustomUser;
 import com.bojan.flightadvisor.service.CityService;
 import com.bojan.flightadvisor.service.FlightService;
 import com.bojan.flightadvisor.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
@@ -30,7 +28,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/city")
+@RequestMapping("/api/v1/cities")
 public class CityController {
 
     @Autowired
@@ -55,21 +53,21 @@ public class CityController {
 
     @Operation(summary = "Add new city", description = "Adding a new city", tags = { "city" })
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/add")
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public CityDto addCity(@NotNull @Valid @RequestBody final CityDto cityDto) {
 
         return cityService.addCity(cityDto);
     }
 
-    @Operation(summary = "Get all cities", description = "Get all cities", tags = { "city" })
+    @Operation(summary = "Get all cities", description = "Get all cities", tags = { "city" }, security = @SecurityRequirement(name = "basicAuth"))
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<CityDto> getAllCities(@RequestParam final Optional<Integer> commentsNum) {
         return cityService.searchCities(Optional.empty(), commentsNum);
     }
 
-    @Operation(summary = "Search for city by name", description = "Search for city by name", tags = { "city" })
+    @Operation(summary = "Search for city by name", description = "Search for city by name", tags = { "city" }, security = @SecurityRequirement(name = "basicAuth"))
     @GetMapping("/{name}")
     @ResponseStatus(HttpStatus.OK)
     public List<CityDto> searchCities(@PathVariable @NotNull final String name, @RequestParam final Optional<Integer> commentsNum) {
@@ -78,8 +76,8 @@ public class CityController {
 
     }
 
-    @Operation(summary = "Add a comment", description = "Add a comment to a city", tags = { "comment" })
-    @PostMapping("/comment/add")
+    @Operation(summary = "Add a comment", description = "Add a comment to a city", tags = { "comment" }, security = @SecurityRequirement(name = "basicAuth"))
+    @PostMapping("/comments")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public CityCommentDto addComment(@NotNull @Valid @RequestBody final CityCommentDto comment) {
 
@@ -88,8 +86,18 @@ public class CityController {
         return cityService.addComment(comment, user);
     }
 
-    @Operation(summary = "Delete a comment", description = "Delete a comment to a city", tags = { "comment" })
-    @DeleteMapping("/comment/{id}")
+    @Operation(summary = "Edit a comment", description = "Edit a comment to a city", tags = { "comment" }, security = @SecurityRequirement(name = "basicAuth"))
+    @PutMapping("/comments/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public CityCommentDto updateComment(@NotNull @Valid @RequestBody final CityCommentUpdateDto comment, @PathVariable @NotNull final Long id) {
+
+        CustomUser user = userService.findUserByUsername(
+                SecurityContextHolder.getContext().getAuthentication().getName());
+        return cityService.updateComment(id, comment, user);
+    }
+
+    @Operation(summary = "Delete a comment", description = "Delete a comment to a city", tags = { "comment" }, security = @SecurityRequirement(name = "basicAuth"))
+    @DeleteMapping("/comments/{id}")
     @ResponseStatus(HttpStatus.OK)
     public String deleteComment(@PathVariable @NotNull final Long id) {
 
@@ -98,19 +106,9 @@ public class CityController {
         return cityService.deleteComment(id, user);
     }
 
-    @Operation(summary = "Edit a comment", description = "Edit a comment to a city", tags = { "comment" })
-    @PutMapping("/comment/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public CityCommentDto updateComment(@NotNull @Valid @RequestBody final CityCommentDto comment, @PathVariable @NotNull final Long id) {
-
-        CustomUser user = userService.findUserByUsername(
-                SecurityContextHolder.getContext().getAuthentication().getName());
-        return cityService.updateComment(id, comment, user);
-    }
-
-    @Operation(summary = "Add an airport", description = "Add a new airport", tags = { "airport" })
+    @Operation(summary = "Add airports", description = "Batch import of airports", tags = { "airport" }, security = @SecurityRequirement(name = "basicAuth"))
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/airport/add")
+    @PostMapping("/airports")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public String addAirport(@NotNull @RequestBody final FileImport file)
             throws JobParametersInvalidException, JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
@@ -123,9 +121,9 @@ public class CityController {
         return "ok";
     }
 
-    @Operation(summary = "Add a route", description = "Add a new route", tags = { "route" })
+    @Operation(summary = "Add routes", description = "Batch import of routes", tags = { "route" }, security = @SecurityRequirement(name = "basicAuth"))
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/route/add")
+    @PostMapping("/routes")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public String addRoute(@NotNull @RequestBody final FileImport file)
             throws JobParametersInvalidException, JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
@@ -139,8 +137,8 @@ public class CityController {
 
     }
 
-    @Operation(summary = "Find a cheapest route", description = "Find a cheapest route", tags = { "route" })
-    @GetMapping("/route/from/{cityFrom}/to/{cityTo}")
+    @Operation(summary = "Find a cheapest route", description = "Find a cheapest route", tags = { "route" }, security = @SecurityRequirement(name = "basicAuth"))
+    @GetMapping("/routes/from/{cityFrom}/to/{cityTo}")
     @ResponseStatus(HttpStatus.OK)
     public FlightDto searchCheapestRoute(@PathVariable @NotNull final Long cityFrom, @PathVariable @NotNull final Long cityTo) {
         return flightService.calculateCheapest(cityFrom, cityTo);

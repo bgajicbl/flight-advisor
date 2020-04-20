@@ -37,7 +37,7 @@ class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .csrf()
                 .disable()
                 .authorizeRequests()
-                .antMatchers("/api/users/registration", "/error",
+                .antMatchers("/api/v1/users/register", "/error",
                         "/h2-console/**", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html")
                 .permitAll()
                 .anyRequest()

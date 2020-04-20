@@ -32,6 +32,12 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserDetailsMapper userDetailsMapper;
 
+    /**
+     * Handles user registration
+     *
+     * @param userDto
+     * @return the UserDto object
+     */
     @Override
     public UserDto register(final UserDto userDto) {
         Optional<CustomUser> userOpt = userRepository.findByUsername(userDto.getUsername());

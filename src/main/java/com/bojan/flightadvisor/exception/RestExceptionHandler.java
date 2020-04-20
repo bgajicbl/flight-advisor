@@ -25,7 +25,7 @@ import javax.validation.ConstraintViolationException;
 import static org.springframework.http.HttpStatus.*;
 
 /**
- *
+ * Custom Exception handler
  */
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice

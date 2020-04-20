@@ -12,7 +12,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping("/api/v1/users")
 @Tag(name = "user", description = "the User API")
 public class UserController {
 
@@ -20,7 +20,7 @@ public class UserController {
     private UserService userService;
 
     @Operation(summary = "Register new user", description = "Registration of a new user", tags = { "user" })
-    @PostMapping("/registration")
+    @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
     public UserDto register(@NotNull @Valid @RequestBody final UserDto userDto) {
         return userService.register(userDto);

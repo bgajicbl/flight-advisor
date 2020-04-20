@@ -54,7 +54,7 @@ class CityControllerTest {
         ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
         String requestJson = ow.writeValueAsString(request);
 
-        this.mocMvc.perform(post("/api/city/add").contentType(MediaType.APPLICATION_JSON)
+        this.mocMvc.perform(post("/api/v1/cities").contentType(MediaType.APPLICATION_JSON)
                 .content(requestJson))
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(jsonPath("$.name").value(request.getName()));
@@ -64,13 +64,13 @@ class CityControllerTest {
     @WithMockUser(username = "admin", roles = {"USER"})
     void givenRegularUser_addCity_thenAuthError() throws Exception {
 
-        this.mocMvc.perform(post("/api/city/add").contentType(MediaType.APPLICATION_JSON))
+        this.mocMvc.perform(post("/api/v1/cities").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is4xxClientError());
     }
 
     @Test
     void getAllCities() throws Exception {
-        this.mocMvc.perform(get("/api/city"))
+        this.mocMvc.perform(get("/api/v1/cities"))
                 .andExpect(status().is2xxSuccessful());
     }
 

@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -39,10 +40,12 @@ class UserControllerTest {
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
         ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
-        String requestJson=ow.writeValueAsString(request );
+        String requestJson = ow.writeValueAsString(request);
 
-        this.mocMvc.perform(post("/api/users/registration").contentType(MediaType.APPLICATION_JSON)
+        this.mocMvc.perform(post("/api/v1/users/register").contentType(MediaType.APPLICATION_JSON)
                 .content(requestJson))
-                .andExpect(status().is2xxSuccessful());
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$.username").value(request.getUsername()));
+
     }
 }

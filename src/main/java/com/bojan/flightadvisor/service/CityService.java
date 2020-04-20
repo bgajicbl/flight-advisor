@@ -2,6 +2,7 @@ package com.bojan.flightadvisor.service;
 
 import com.bojan.flightadvisor.dto.model.AirportDto;
 import com.bojan.flightadvisor.dto.model.CityCommentDto;
+import com.bojan.flightadvisor.dto.model.CityCommentUpdateDto;
 import com.bojan.flightadvisor.dto.model.CityDto;
 import com.bojan.flightadvisor.entity.CustomUser;
 
@@ -20,5 +21,5 @@ public interface CityService {
 
     String deleteComment(Long commentId, CustomUser user);
 
-    CityCommentDto updateComment(Long id, CityCommentDto comment, CustomUser user);
+    CityCommentDto updateComment(Long id, CityCommentUpdateDto comment, CustomUser user);
 }
