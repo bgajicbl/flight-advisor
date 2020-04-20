@@ -5,6 +5,7 @@ import com.bojan.flightadvisor.dto.model.CityCommentDto;
 import com.bojan.flightadvisor.dto.model.CityCommentUpdateDto;
 import com.bojan.flightadvisor.dto.model.CityDto;
 import com.bojan.flightadvisor.entity.CustomUser;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,11 +16,13 @@ public interface CityService {
 
     AirportDto addAirport(AirportDto airportDto);
 
-    List<CityDto> searchCities(Optional<String> nameOpt, Optional<Integer> commentsNum);
+    List<CityDto> searchCities(String name, Optional<Integer> commentsNum);
+
+    List<CityDto> getAllCities(Optional<Integer> commentsNum, Pageable pageable);
 
     CityCommentDto addComment(CityCommentDto commentDto, CustomUser user);
 
-    String deleteComment(Long commentId, CustomUser user);
+    void deleteComment(Long commentId, CustomUser user);
 
     CityCommentDto updateComment(Long id, CityCommentUpdateDto comment, CustomUser user);
 }

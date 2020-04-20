@@ -75,6 +75,15 @@ class CityControllerTest {
     }
 
     @Test
+    void getAllCities_evaluatesPageableParameter() throws Exception {
+        this.mocMvc.perform(get("/api/v1/cities")
+                .param("page", "2")
+                .param("size", "2")
+                .param("sort", "name,asc"))
+                .andExpect(status().is2xxSuccessful());
+    }
+
+    @Test
     void searchCities() {
     }
 

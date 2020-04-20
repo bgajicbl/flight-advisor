@@ -16,6 +16,8 @@ import com.bojan.flightadvisor.repository.AirportRepository;
 import com.bojan.flightadvisor.repository.CityCommentRepository;
 import com.bojan.flightadvisor.repository.CityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 
@@ -84,37 +86,51 @@ public class CityServiceImpl implements CityService {
      * @return list of CityDto
      */
     @Override
-    public List<CityDto> searchCities(final Optional<String> nameOpt, final Optional<Integer> commentsNum) {
-        List<City> cities = null;
-        if (nameOpt.isPresent()) {
-            cities = cityRepository.findByNameIgnoreCase(nameOpt.get());
-        } else {
-            cities = cityRepository.findAll();
-        }
+    public List<CityDto> searchCities(final String name, final Optional<Integer> commentsNum) {
+        List<City> cities = cityRepository.findByNameIgnoreCase(name);
+
         if (cities.isEmpty()) {
             return Collections.emptyList();
         }
-
-        if (commentsNum.isPresent()) {
-            List<City> filteredCities = new ArrayList<>();
-            for (City city : cities) {
-                filterCityComments(city, commentsNum.get());
-                filteredCities.add(city);
-            }
-            cities = filteredCities;
-        }
+        //filter number of comments
+        filterCityComments(cities, commentsNum);
         return cities
                 .stream()
                 .map(city -> CityMapper.toCityDto(city))
                 .collect(Collectors.toList());
-
     }
 
-    private void filterCityComments(final City city, final int number) {
-        SortedSet<CityComment> cityComments = city.getComments().stream().limit(number)
-                .collect(Collectors.toCollection(TreeSet::new));
-        city.setComments(cityComments);
+    /**
+     *
+     * @param commentsNum
+     * @param pageable
+     * @return
+     */
+    @Override
+    public List<CityDto> getAllCities(final Optional<Integer> commentsNum, Pageable pageable) {
+        Page<City> cityPage = cityRepository.findAll(pageable);
 
+        if (!cityPage.hasContent()) {
+            return Collections.emptyList();
+        }
+        List<City> cities = cityPage.getContent();
+        //filter number of comments
+        filterCityComments(cities, commentsNum);
+
+        return cities
+                .stream()
+                .map(city -> CityMapper.toCityDto(city))
+                .collect(Collectors.toList());
+    }
+
+    private void filterCityComments(List<City> cityList, Optional<Integer> num) {
+        if (num.isPresent()) {
+            for (City city : cityList) {
+                SortedSet<CityComment> cityComments = city.getComments().stream().limit(num.get())
+                        .collect(Collectors.toCollection(TreeSet::new));
+                city.setComments(cityComments);
+            }
+        }
     }
 
     /**
@@ -150,13 +166,12 @@ public class CityServiceImpl implements CityService {
      * @return String message
      */
     @Override
-    public String deleteComment(final Long commentId, final CustomUser user) {
+    public void deleteComment(final Long commentId, final CustomUser user) {
         CityComment cityComment = cityCommentRepository.findById(commentId)
                 .orElseThrow(() -> new EntityNotFoundException(CityComment.class, "id", commentId.toString()));
 
         if (user.equals(cityComment.getUser())) {
             cityCommentRepository.delete(cityComment);
-            return "Deleted!";
         } else {
             throw new AccessDeniedException("Can't delete comments from other users!");
         }
