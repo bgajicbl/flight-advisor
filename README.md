@@ -1,2 +1,2 @@
 # flight-advisor
-Flight advisor Spring Boot project
+Flight advisor Spring Boot project 
